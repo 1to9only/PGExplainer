@@ -19,3 +19,13 @@ Only these options are supported:
 ```
 The default FORMAT is "%g ED=%r/%p/%d", so this does not have to be specified.
 
+## Options - for sudokus with multiple solution
+Only these options are supported:
+```
+-M  for sudokus with multiple solution
+
+-N  use with -M, disable Nested Forcing Chains checks
+-D  use with -M, disable Dynamic Forcing Chains checks (implies -N)
+
+```
+

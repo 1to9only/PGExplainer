@@ -91,6 +91,61 @@ public class Solver {
         experimentalHintProducers.add( new Chaining(true, true, false, 4, true, 2));
     }
 
+    public Solver(Grid grid, int multi, int dynamic, int nested) {
+        this.grid = grid;
+
+        directHintProducers = new ArrayList<HintProducer>();
+        directHintProducers.add( new HiddenSingle());
+        directHintProducers.add( new Locking(true));
+        directHintProducers.add( new HiddenSet(2, true));
+        directHintProducers.add( new NakedSingle());
+        directHintProducers.add( new HiddenSet(3, true));
+
+        indirectHintProducers = new ArrayList<IndirectHintProducer>();
+        indirectHintProducers.add( new Locking(false));
+        indirectHintProducers.add( new NakedSet(2));
+        indirectHintProducers.add( new Fisherman(2));
+        indirectHintProducers.add( new HiddenSet(2, false));
+        indirectHintProducers.add( new NakedSet(3));
+        indirectHintProducers.add( new Fisherman(3));
+        indirectHintProducers.add( new HiddenSet(3, false));
+        indirectHintProducers.add( new XYWing(false));
+        indirectHintProducers.add( new XYWing(true));
+      if ( multi == 0 )
+        indirectHintProducers.add( new UniqueLoops());
+        indirectHintProducers.add( new NakedSet(4));
+        indirectHintProducers.add( new Fisherman(4));
+        indirectHintProducers.add( new HiddenSet(4, false));
+      if ( multi == 0 )
+        indirectHintProducers.add( new BivalueUniversalGrave());
+        indirectHintProducers.add( new AlignedPairExclusion());
+
+        chainingHintProducers = new ArrayList<IndirectHintProducer>();
+        chainingHintProducers.add( new Chaining(false, false, false, 0, true, 0));
+        chainingHintProducers.add( new AlignedExclusion(3));
+        chainingHintProducers.add( new Chaining(false, true, true, 0, true, 0));
+        chainingHintProducers.add( new Chaining(true, false, false, 0, true, 0));
+      if ( dynamic == 0 )
+        chainingHintProducers.add( new Chaining(true, true, false, 0, true, 0));
+
+        chainingHintProducers2 = new ArrayList<IndirectHintProducer>();
+      if ( dynamic == 0 )
+        chainingHintProducers2.add( new Chaining(true, true, false, 1, true, 0));
+
+        advancedHintProducers = new ArrayList<IndirectHintProducer>();
+      if ( nested == 0 ) {
+        advancedHintProducers.add( new Chaining(true, true, false, 2, true, 0));
+        advancedHintProducers.add( new Chaining(true, true, false, 3, true, 0));
+      }
+
+        experimentalHintProducers = new ArrayList<IndirectHintProducer>();
+      if ( nested == 0 ) {
+        experimentalHintProducers.add( new Chaining(true, true, false, 4, true, 0));
+        experimentalHintProducers.add( new Chaining(true, true, false, 4, true, 1));
+        experimentalHintProducers.add( new Chaining(true, true, false, 4, true, 2));
+      }
+    }
+
     /**
      * This is the basic Sudoku rule: If a cell contains a value,
      * that value can be removed from the potential values of
@@ -179,6 +234,45 @@ public class Solver {
             Hint hint = accu.getHint();
             if (hint == null) {
                 difficulty = 20.0;
+                break;
+            }
+            Rule rule = (Rule)hint;
+            double ruleDiff = rule.getDifficulty();
+            if (ruleDiff > difficulty)
+                difficulty = ruleDiff;
+            hint.apply(grid);
+            if (pearl == 0.0) {
+                if (diamond == 0.0)
+                    diamond = difficulty;
+                if (hint.getCell() != null) {
+                    pearl = difficulty;
+                }
+            }
+        }
+    }
+
+    public void getClosureDifficulty() {
+        difficulty = 0.0;
+        pearl = 0.0;
+        diamond = 0.0;
+        while (!isSolved()) {
+            SingleHintAccumulator accu = new SingleHintAccumulator();
+            try {
+                for (HintProducer producer : directHintProducers)
+                    producer.getHints(grid, accu);
+                for (IndirectHintProducer producer : indirectHintProducers)
+                    producer.getHints(grid, accu);
+                for (IndirectHintProducer producer : chainingHintProducers)
+                    producer.getHints(grid, accu);
+                for (IndirectHintProducer producer : chainingHintProducers2)
+                    producer.getHints(grid, accu);
+                for (IndirectHintProducer producer : advancedHintProducers)
+                    producer.getHints(grid, accu);
+                for (IndirectHintProducer producer : experimentalHintProducers)
+                    producer.getHints(grid, accu);
+            } catch (InterruptedException willHappen) {}
+            Hint hint = accu.getHint();
+            if (hint == null) {
                 break;
             }
             Rule rule = (Rule)hint;

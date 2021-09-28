@@ -13,8 +13,8 @@ import sudoku.*;
 
 public class serate {
     static String FORMAT = "%g ED=%r/%p/%d";
-    static String RELEASE = "2021-3-30";
-    static String VERSION = "2021.3.30";
+    static String RELEASE = "2021-09-28";
+    static String VERSION = "1.2.1.3";
 
     /**
      * Solve input puzzles and print results according to the output format.
@@ -31,6 +31,9 @@ public class serate {
         BufferedReader  reader = null;
         PrintWriter     writer = null;
         int             arg;
+        int             multi = 0;     
+        int             dynamic = 0;
+        int             nested = 0;
         char            c;
         try {
             for (arg = 0; arg < args.length; arg++) {
@@ -62,8 +65,8 @@ public class serate {
                     c = s.charAt(1);
                     if (s.length() > 2)
                         v = s.substring(2);
-                    else if (++arg < args.length)
-                        v = args[arg];
+                    else if ( ( c=='f' || c=='i' || c=='o') && ( (arg+1) < args.length) )
+                        v = args[++arg];
                 }
                 switch (c) {
                 case 'f':
@@ -74,6 +77,16 @@ public class serate {
                     break;
                 case 'o':
                     output = v;
+                    break;
+                case 'M':
+                    multi = 1;     
+                    break;
+                case 'D':
+                    dynamic = 1;
+                    nested = 1;
+                    break;
+                case 'N':
+                    nested = 1;
                     break;
                 default:
                     break;
@@ -118,10 +131,17 @@ public class serate {
                             grid.setCellValue(i % 9, i / 9, value);
                         }
                     }
-                    Solver solver = new Solver(grid);
+                    Solver solver = null;
+                  if ( multi == 0 )
+                    solver = new Solver(grid);
+                  if ( multi == 1 )
+                    solver = new Solver(grid, multi, dynamic, nested);
                     solver.rebuildPotentialValues();
                     try {
+                      if ( multi == 0 )
                         solver.getDifficulty();
+                      if ( multi == 1 )
+                        solver.getClosureDifficulty();
                     } catch (UnsupportedOperationException ex) {
                         solver.difficulty = solver.pearl = solver.diamond = 0.0;
                     }
