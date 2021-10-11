@@ -26,7 +26,6 @@ public class Chaining implements IndirectHintProducer {
     private final int nestingLimit;
     private Grid saveGrid = new Grid();
     private List<IndirectHintProducer> otherRules;
-    private Collection<ChainingHint> lastHints = null;
 
     /**
      * Create the engine for searching forcing chains.
@@ -949,7 +948,7 @@ public class Chaining implements IndirectHintProducer {
 
     public void getHints(Grid grid, HintsAccumulator accu) throws InterruptedException {
         List<ChainingHint> result = getHintList(grid);
-        lastHints = new LinkedHashSet<ChainingHint>(result);
+        Collection<ChainingHint> lastHints = new LinkedHashSet<ChainingHint>(result);
         for (IndirectHint hint : lastHints)
             accu.add(hint);
     }
