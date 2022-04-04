@@ -45,9 +45,7 @@ public class Chaining implements IndirectHintProducer {
     }
 
     double getDifficulty() {
-        if (level >= 2)
-            return 9.5 + 0.5 * (level - 2);
-        else if (level > 0)
+        if (level > 0)
             return 8.5 + 0.5 * level;
         else if (isNisho)
             return 7.5;
@@ -86,15 +84,12 @@ public class Chaining implements IndirectHintProducer {
             public int compare(ChainingHint h1, ChainingHint h2) {
                 double d1 = h1.getDifficulty();
                 double d2 = h2.getDifficulty();
-                if (d1 < d2)
-                    return -1;
-                else if (d1 > d2)
-                    return 1;
+                if (d1 < d2) return -1;
+                if (d1 > d2) return 1;
                 int l1 = h1.getComplexity();
                 int l2 = h2.getComplexity();
-                if (l1 == l2)
-                    return h1.getSortKey() - h2.getSortKey();
-                return l1 - l2;
+                if (l1 != l2) return l1 - l2;
+                return h1.getSortKey() - h2.getSortKey();
             }
         });
         return result;
@@ -434,8 +429,7 @@ public class Chaining implements IndirectHintProducer {
                     LinkedSet<Potential> regionToOn = new LinkedSet<Potential>();
                     LinkedSet<Potential> regionToOff = new LinkedSet<Potential>();
 
-                    for (int pos = firstPos; pos >= 0;
-                            pos = potentialPositions.nextSetBit(pos + 1)) {
+                    for (int pos = firstPos; pos >= 0; pos = potentialPositions.nextSetBit(pos+1)) {
                         Cell otherCell = region.getCell(pos);
                         if (otherCell.equals(cell)) {
                             posToOn.put(pos, onToOn);
@@ -532,7 +526,7 @@ public class Chaining implements IndirectHintProducer {
         BitSet curPositions = curRegion.copyPotentialPositions(p.value);
         BitSet srcPositions = srcRegion.copyPotentialPositions(p.value);
         srcPositions.andNot(curPositions);
-        for (int i = srcPositions.nextSetBit(0); i >= 0; i = srcPositions.nextSetBit(i + 1)) {
+        for (int i = srcPositions.nextSetBit(0); i >= 0; i = srcPositions.nextSetBit(i+1)) {
             Cell curCell = curRegion.getCell(i);
             Potential parent = new Potential(curCell, p.value, false);
             parent = offPotentials.get(parent);
@@ -569,7 +563,7 @@ public class Chaining implements IndirectHintProducer {
             if (potentialValues.cardinality() == 2) {
                 int otherValue = potentialValues.nextSetBit(0);
                 if (otherValue == p.value)
-                    otherValue = potentialValues.nextSetBit(otherValue + 1);
+                    otherValue = potentialValues.nextSetBit(otherValue+1);
                 Potential pOn = new Potential(p.cell, otherValue, true, p,
                         Potential.Cause.NakedSingle, "only remaining possible value in the cell");
                 addHiddenParentsOfCell(pOn, grid, source, offPotentials);
@@ -585,7 +579,7 @@ public class Chaining implements IndirectHintProducer {
                     int otherPosition = potentialPositions.nextSetBit(0);
                     Cell otherCell = region.getCell(otherPosition);
                     if (otherCell.equals(p.cell)) {
-                        otherPosition = potentialPositions.nextSetBit(otherPosition + 1);
+                        otherPosition = potentialPositions.nextSetBit(otherPosition+1);
                         otherCell = region.getCell(otherPosition);
                     }
                     Potential pOn = new Potential(otherCell, p.value, true, p,
@@ -775,7 +769,7 @@ public class Chaining implements IndirectHintProducer {
             }
         }
         int index = 0;
-        while (index < otherRules.size() && result.isEmpty()) {
+        while (result.isEmpty() && index < otherRules.size()) {
             IndirectHintProducer rule = otherRules.get(index);
             try {
                 rule.getHints(grid, new HintsAccumulator() {
@@ -794,9 +788,8 @@ public class Chaining implements IndirectHintProducer {
                             Map<Cell,BitSet> removable = hint.getRemovablePotentials();
                             for (Cell cell : removable.keySet()) {
                                 BitSet values = removable.get(cell);
-                                for (int value = values.nextSetBit(0); value >= 0; value = values.nextSetBit(value + 1)) {
-                                    Potential.Cause cause = Potential.Cause.Advanced;
-                                    Potential toOff = new Potential(cell, value, false, cause,
+                                for (int value = values.nextSetBit(0); value >= 0; value = values.nextSetBit(value+1)) {
+                                    Potential toOff = new Potential(cell, value, false, Potential.Cause.Advanced,
                                             "hint.toString()", nested);
                                     for (Potential p : parents) {
                                         Potential real = offPotentials.get(p);

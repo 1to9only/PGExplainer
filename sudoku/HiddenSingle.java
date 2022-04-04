@@ -35,11 +35,8 @@ public class HiddenSingle implements DirectHintProducer {
             for (int value = 1; value <= 9; value++) {
                 BitSet potentialIndexes = region.getPotentialPositions(value);
                 if (potentialIndexes.cardinality() == 1) {
-                    int uniqueIndex = potentialIndexes.nextSetBit(0);
-                    Cell cell = region.getCell(uniqueIndex);
-                    boolean isAlone = region.getEmptyCellCount() == 1;
-                    if (isAlone == aloneOnly)
-                        accu.add(new HiddenSingleHint(this, region, cell, value, isAlone));
+                    if ((region.getEmptyCellCount() == 1) == aloneOnly)
+                        accu.add(new HiddenSingleHint(this, region, region.getCell(potentialIndexes.nextSetBit(0)), value, aloneOnly));
                 }
             }
         }

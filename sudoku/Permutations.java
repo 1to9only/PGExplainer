@@ -25,7 +25,7 @@ package sudoku;
  * <li>11010
  * <li>11100
  * </ul>
- * Code adapted from "Hacker's Delight" by Henry S. Warren, 
+ * Code adapted from "Hacker's Delight" by Henry S. Warren,
  * ISBN 0-201-91465-4
  */
 public class Permutations {
@@ -48,14 +48,6 @@ public class Permutations {
      * @param countBits the length of the binary numbers in bits
      */
     public Permutations(int countOnes, int countBits) {
-        if (countOnes < 0)
-            throw new IllegalArgumentException("countOnes < 0");
-        if (countBits < 0)
-            throw new IllegalArgumentException("countBits < 0");
-        if (countOnes > countBits)
-            throw new IllegalArgumentException("countOnes > countBits");
-        if (countBits > 64)
-            throw new IllegalArgumentException("countBits > 64");
         this.countBits = countBits;
         this.countOnes = countOnes;
         this.value = (1 << countOnes) - 1;

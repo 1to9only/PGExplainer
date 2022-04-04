@@ -13,7 +13,7 @@ import sudoku.*;
 
 public class serate {
     static String FORMAT = "%g ED=%r/%p/%d";
-    static String RELEASE = "2021-09-28";
+    static String RELEASE = "2022-04-04";
     static String VERSION = "1.2.1.3";
 
     /**

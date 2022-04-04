@@ -148,7 +148,7 @@ public class BivalueUniversalGrave implements IndirectHintProducer {
             if (region != null) {
                 List<Cell> regionCells = new ArrayList<Cell>();
                 for (Cell cell : commonCells) {
-                    if (grid.getRegionAt(regionType, cell).equals(region))
+                    if (region.equals(grid.getRegionAt(regionType, cell)))
                         regionCells.add(cell);
                 }
                 for (int degree = 2; degree <= 6; degree++) {

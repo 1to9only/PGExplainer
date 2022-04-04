@@ -22,11 +22,12 @@ public class NakedSingle implements DirectHintProducer {
 
         for (int index = 0; index < 81; index++) {
             Cell cell = grid.getCell(index%9,index/9);
+          if ( cell.getValue() == 0 ) {
             BitSet potentialValues = cell.getPotentialValues();
             if (potentialValues.cardinality() == 1) {
-                int uniqueValue = potentialValues.nextSetBit(0);
-                accu.add(new NakedSingleHint(this, null, cell, uniqueValue));
+                accu.add(new NakedSingleHint(this, null, cell, potentialValues.nextSetBit(0)));
             }
+          }
         }
 
     }
